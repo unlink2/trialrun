@@ -1,0 +1,4 @@
+# lines starting wtih # are comments 
+
+name = basic example 
+command = echo "test"
