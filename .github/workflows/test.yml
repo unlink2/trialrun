@@ -20,6 +20,6 @@ jobs:
     - name: Install dependencies
       run: sudo apt install libcmocka-dev bear
     - name: Run lint 
-      run: make buildcmd && make lint
+      run: echo "TODO enable lint" # make buildcmd && make lint
     - name: Run tests
       run: make test
