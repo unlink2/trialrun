@@ -10,4 +10,8 @@ typedef struct Buffer {
   Errors err;
 } Buffer;
 
+Buffer buffer_init();
+
+void buffer_free(Buffer *buffer);
+
 #endif

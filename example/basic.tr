@@ -1,25 +1,25 @@
 # lines starting wtih # are comments 
 
-name = basic example 
-command = echo "test"
+name=basic example 
+command=echo "test"
 
 # files called '-' are treated as stdin or stdout depending on context 
 # read test data from stdout (starting at 'begin' and ending at 'end')  
-data = - 
+data=- 
 
 # expected output 
-expected = expected.txt 
+expected=expected.txt 
 
 # you can choose to ignore a line count 
-# ignore-lines = 1, 2, 3, 4
+# ignore-lines=1, 2, 3, 4
 # ignore the first N chars of each line 
-# ignore-begin = 4 
+# ignore-begin=4 
 # ignore the last N chars of each line 
-# ignore-end = 2 
+# ignore-end=2 
 
 # begin and end string can be changed if needed 
-# begin = ===BEGIN=== 
-# end = ===END===
+# begin====BEGIN=== 
+# end====END===
 
 # echo stdout of command back 
-# echo = false 
+# echo=false 
