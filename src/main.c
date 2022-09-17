@@ -2,16 +2,58 @@
 /**
  * When built without test
  */
+#include "config.h"
+#include <string.h>
 #ifndef TEST
 
 /// only use main if binary
 #if TYPE == bin
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <argp.h>
+
+const char *argp_program_version = "trialrun 0.1";
+const char *argp_program_bug_address = "<lukas@krickl.dev>";
+static char doc[] = "trialrun";
+static char args_doc[] = "";
+
+static struct argp_option options[] = {{0}};
+
+static error_t parse_opt(int key, char *arg, struct argp_state *state) {
+  Config *cfg = state->input;
+  switch (key) {
+  case ARGP_KEY_ARG:
+    if (state->arg_num >= 0) {
+      /* Too many arguments. */
+      argp_usage(state); // NOLINT
+    }
+
+    // arguments->args[state->arg_num] = arg;
+
+    break;
+  case ARGP_KEY_END:
+    if (state->arg_num < 0) {
+      /* Not enough arguments. */
+      argp_usage(state); // NOLINT
+    }
+    break;
+  default:
+    return ARGP_ERR_UNKNOWN;
+  }
+  return 0;
+}
+
+static struct argp argp = {options, parse_opt, args_doc, doc};
 
 int main(int argc, char **argv) {
-  printf("Hello world!\n");
-  return 0;
+  int exit_code = 0;
+
+  cfg();
+  cfg_init(cfg);
+  argp_parse(&argp, argc, argv, 0, 0, &cfg); // NOLINT
+
+  return exit_code;
 }
 
 #endif
@@ -23,12 +65,10 @@ int main(int argc, char **argv) {
 #ifdef TEST
 
 #include "macros.h"
-#include "example.h"
+#include "error.h"
 
 int main(int argc, char **argv) {
-  const struct CMUnitTest tests[] = {
-      cmocka_unit_test(test_is_zero),
-  };
+  const struct CMUnitTest tests[] = {NULL};
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
 
