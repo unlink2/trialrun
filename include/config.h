@@ -4,7 +4,7 @@
 #include "types.h"
 
 typedef struct Config {
-  u8 log_level;
+  u32 log_level;
 } Config;
 
 extern Config global_cfg;
