@@ -3,7 +3,7 @@
 name = basic example 
 command = echo "test"
 
-# file called '-' are treated as stdin or stdout depending on context 
+# files called '-' are treated as stdin or stdout depending on context 
 # read test data from stdout (starting at 'begin' and ending at 'end')  
 data = - 
 
@@ -21,5 +21,5 @@ expected = expected.txt
 # begin = ===BEGIN=== 
 # end = ===END===
 
-# echo stdout of process back 
+# echo stdout of command back 
 # echo = false 
