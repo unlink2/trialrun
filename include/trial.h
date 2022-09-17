@@ -15,12 +15,7 @@ typedef struct Trial {
   char *data_path;
   char *expected_path;
 
-  // lines to ignore. array of line numbers
-  u32 *ignore_lines;
-  usize ignore_lines_len;
-
-  u32 ignore_begin;
-  u32 ignore_end;
+  char *test_line_prefix;
 
   char *begin;
   char *end;
@@ -30,6 +25,8 @@ typedef struct Trial {
   Errors err;
 } Trial;
 
+void trial_init(Trial *t);
+
 /**
  * Parse a .tr file from an input string
  * a tr file is simply a collection key=value pairs
@@ -37,5 +34,11 @@ typedef struct Trial {
 Trial trial_from(char *input);
 
 void trial_free(Trial *trial);
+
+#ifdef TEST
+
+void test_trial_parse_next(void **state);
+
+#endif
 
 #endif
