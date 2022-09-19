@@ -11,6 +11,9 @@ typedef struct Config {
   // This can either be a directory of files
   // or a single file
   char *tr_path;
+
+  char *in_path;
+  char *out_path;
 } Config;
 
 extern Config global_cfg;

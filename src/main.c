@@ -20,13 +20,22 @@ static char doc[] = "trialrun";
 static char args_doc[] = "";
 
 static struct argp_option options[] = {
-    {"verbose", 'v', NULL, 0, "Enable verbose output"}, {0}};
+    {"verbose", 'v', NULL, 0, "Enable verbose output"},
+    {"input", 'i', "PATH", 0, "The input trialrun file or directory"},
+    {"output", 'o', "PATH", 0, "The output file"},
+    {0}};
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
   Config *cfg = state->input;
   switch (key) {
   case 'v':
     cfg->log_level = LOG_LEVEL_LEN;
+    break;
+  case 'i':
+    cfg->in_path = arg;
+    break;
+  case 'o':
+    cfg->out_path = arg;
     break;
   case ARGP_KEY_ARG:
     if (state->arg_num >= 0) {
