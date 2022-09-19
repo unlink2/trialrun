@@ -4,7 +4,7 @@
 #include "types.h"
 
 typedef struct TrStr {
-  const usize len;
+  usize len;
   const char *raw;
 } TrStr;
 
@@ -14,5 +14,7 @@ TrStr trstr_init(const char *s, const usize len);
 
 // Compare a trstr for equality
 bool trstr_eq(const TrStr left, const TrStr right);
+
+bool trstr_eq_raw(const TrStr left, const char *right, usize len);
 
 #endif

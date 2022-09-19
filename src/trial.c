@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "macros.h"
+#include "trstring.h"
 
 #define BEGIN "===BEGIN"
 #define END "===END"
@@ -23,11 +24,11 @@ char *default_str_from(const char *d) {
 
 bool trial_is_end(char c) { return c == '\0' || c == '\n' || c == '\r'; }
 
-bool trial_bool_val(char *value, usize len, Errors *err) {
+bool trial_bool_val(TrStr value, Errors *err) {
   *err = OK;
-  if (strncmp("true", value, 4) == 0) {
+  if (trstr_eq_raw(value, "true", 4)) {
     return TRUE;
-  } else if (strncmp("false", value, 5) == 0) {
+  } else if (trstr_eq_raw(value, "false", 5)) {
     return FALSE;
   } else {
     *err = ERR_TRIAL_PARSER_VALUE_ERROR;
@@ -35,15 +36,14 @@ bool trial_bool_val(char *value, usize len, Errors *err) {
   }
 }
 
-Errors trial_parse_handle(Trial *t, char *key, usize key_len, char *value,
-                          usize value_len) {
+Errors trial_parse_handle(Trial *t, TrStr key, TrStr value) {
 
   Errors err = OK;
 
   // dumb check for each possible key
   // TODO there has to be a better way!
-  if (strncmp("echo", key, 4) == 0) {
-    t->echo = trial_bool_val(value, value_len, &err);
+  if (trstr_eq_raw(key, "echo", 4)) {
+    t->echo = trial_bool_val(value, &err);
   } else {
     return ERR_TRIAL_PARSER_KEY_ERROR;
   }
@@ -56,13 +56,12 @@ TrialParseResult trial_parse_next(Trial *t, char *input) {
   TrialParseResult r;
   r.start = input; // start of line
 
-  char *key = input;
-  usize key_len = 0;
+  TrStr key = trstr_init(input, 0);
 
   // get key until = or end of line
   while (input[0] != DELIM && !trial_is_end(input[0])) {
     input++;
-    key_len++;
+    key.len++;
   }
 
   // if we did not find an = the file is invalid
@@ -73,17 +72,16 @@ TrialParseResult trial_parse_next(Trial *t, char *input) {
   }
 
   // otherwise we now have a key
-  char *value = ++input; // char after = is start of value
-  usize value_len = 0;
+  TrStr value = trstr_init(++input, 0); // char after = is start of value
 
   // obtain value
   while (!trial_is_end(input[0])) {
     input++;
-    value_len++;
+    value.len++;
   }
 
   r.next = input;
-  r.err = trial_parse_handle(t, key, key_len, value, value_len);
+  r.err = trial_parse_handle(t, key, value);
 
   return r;
 }
