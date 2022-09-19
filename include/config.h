@@ -33,4 +33,7 @@ FILE *open_output(Config *cfg);
 // or a single test if path is a file
 Errors run_tests(Config *cfg);
 
+// Run a single test
+Errors run_test(Config *cfg, FILE *f);
+
 #endif

@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "error.h"
+#include <stdio.h>
 
 /**
  * Struct representing a parsed
@@ -32,6 +33,8 @@ void trial_init(Trial *t);
  * a tr file is simply a collection key=value pairs
  */
 Trial trial_from(char *input);
+
+void trial_run(Trial *t, FILE *out);
 
 void trial_free(Trial *trial);
 

@@ -121,6 +121,12 @@ Trial trial_from(char *input) {
   return trial;
 }
 
+void trial_run(Trial *t, FILE *out) {
+  if (t->err) {
+    return;
+  }
+}
+
 void trial_free(Trial *trial) {
   if (trial->err) {
     return;
