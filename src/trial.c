@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "macros.h"
 #include "trstring.h"
+#include "log.h"
 
 #define BEGIN "===BEGIN"
 #define END "===END"
@@ -125,6 +126,20 @@ void trial_run(Trial *t, FILE *out) {
   if (t->err) {
     return;
   }
+
+  bool success = TRUE;
+
+  FILE *pio = popen(t->command, "r"); // NOLINT
+
+  int exit = pclose(pio);
+
+  if (exit != 0) {
+    tr_fprintf(out, INFO, "[%s] Exit code is %d", t->name, exit);
+  }
+
+  success = exit == 0;
+
+  tr_fprintf(out, OUTPUT, "[%s]\t%s\n", success ? "PASSED" : "FAILED", t->name);
 }
 
 void trial_free(Trial *trial) {

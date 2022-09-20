@@ -63,7 +63,7 @@ static struct argp argp = {options, parse_opt, args_doc, doc};
 int main(int argc, char **argv) {
   int exit_code = 0;
 
-  cfg();
+  Config *cfg = cfg();
   cfg_init(cfg);
   argp_parse(&argp, argc, argv, 0, 0, cfg); // NOLINT
 

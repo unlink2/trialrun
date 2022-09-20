@@ -24,7 +24,7 @@ void cfg_init(Config *cfg);
 
 // this macro obtains the config object and
 // creates it in the local scope
-#define cfg() Config *cfg = &global_cfg;
+#define cfg() &global_cfg;
 
 // Re-open stdout to output path if path is not -
 FILE *open_output(Config *cfg);
