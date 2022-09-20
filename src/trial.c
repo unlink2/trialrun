@@ -66,8 +66,8 @@ Errors trial_parse_handle(Trial *t, TrStr key, TrStr value) {
   return err;
 }
 
-char* trial_skip_whitespace(char *input) {
-  // skip leading whitespaces 
+char *trial_skip_whitespace(char *input) {
+  // skip leading whitespaces
   while (isspace(input[0])) {
     input++;
   }
@@ -75,10 +75,10 @@ char* trial_skip_whitespace(char *input) {
   return input;
 }
 
-char* trial_skip_comment(char *input) {
+char *trial_skip_comment(char *input) {
   input = trial_skip_whitespace(input);
   while (input[0] == '#') {
-    // loop until next line 
+    // loop until next line
     while (input[0] != '\n' && !trial_is_end(input[0])) {
       input++;
     }
@@ -89,7 +89,7 @@ char* trial_skip_comment(char *input) {
 
 // parse the next trial input and return the end pointer
 TrialParseResult trial_parse_next(Trial *t, char *input) {
-  TrialParseResult r; 
+  TrialParseResult r;
 
   input = trial_skip_whitespace(input);
   input = trial_skip_comment(input);
@@ -177,10 +177,11 @@ void trial_run(Trial *t, FILE *out) {
 
   bool success = TRUE;
 
-  FILE *pio = popen(t->command, "r"); // NOLINT
+  tr_fprintf(out, INFO, "[%s] Running '%s'...\n", t->name, t->command);
 
-  // read entire output of process 
-  
+  FILE *pio = popen(t->command, "re"); // NOLINT
+
+  // read process output into buffer
 
   int exit = pclose(pio);
 

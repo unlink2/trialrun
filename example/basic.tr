@@ -1,6 +1,6 @@
 # lines starting wtih # are comments 
 
-name=basic example 
+name=basic example
 command=echo "test"
 
 # files called '-' are treated as stdin or stdout depending on context 

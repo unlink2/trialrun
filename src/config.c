@@ -47,7 +47,7 @@ Errors run_tests(Config *cfg) {
   return OK;
 }
 
-Errors run_test(Config *cfg, FILE *f, FILE *out) {
+char *file_read_all(FILE *f) {
   fseek(f, 0, SEEK_END);
   usize len = ftell(f);
   rewind(f);
@@ -56,6 +56,11 @@ Errors run_test(Config *cfg, FILE *f, FILE *out) {
   memset(buffer, 0, len);
 
   fread(buffer, len, 1, f);
+  return buffer;
+}
+
+Errors run_test(Config *cfg, FILE *f, FILE *out) {
+  char *buffer = file_read_all(f);
   // the entire file is in buffer now
   // parse it!
 

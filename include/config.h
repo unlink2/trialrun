@@ -30,6 +30,8 @@ void cfg_init(Config *cfg);
 FILE *open_output(Config *cfg);
 void close_output(FILE *f);
 
+char *file_read_all(FILE *f);
+
 // run all tests if path is a directory
 // or a single test if path is a file
 Errors run_tests(Config *cfg);
