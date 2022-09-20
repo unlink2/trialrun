@@ -11,11 +11,11 @@ data=-
 expected=expected.txt 
 
 # it is possible to only test lines that begin with a prefix 
-# test-line-prefix=__test
+test-line-prefix=__test
 
 # begin and end string can be changed if needed 
-# begin====BEGIN=== 
-# end====END===
+begin====BEGIN=== 
+end====END===
 
 # echo stdout of command back 
-# echo=false 
+echo=false

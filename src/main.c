@@ -61,13 +61,11 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 static struct argp argp = {options, parse_opt, args_doc, doc};
 
 int main(int argc, char **argv) {
-  int exit_code = 0;
-
   Config *cfg = cfg();
   cfg_init(cfg);
   argp_parse(&argp, argc, argv, 0, 0, cfg); // NOLINT
 
-  return exit_code;
+  return run_tests(cfg);
 }
 
 #endif

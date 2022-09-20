@@ -8,7 +8,7 @@
 Config global_cfg;
 
 void cfg_init(Config *cfg) {
-  cfg->log_level = OUTPUT;
+  cfg->log_level = ERROR;
   cfg->in_path = DEFAULT_PATH_IN;
   cfg->out_path = DEFAULT_PATH_OUT;
 }
@@ -31,6 +31,15 @@ Errors run_tests(Config *cfg) {
   FILE *trial_file = fopen(cfg->in_path, "re");
   FILE *out = open_output(cfg);
 
+  if (trial_file == NULL) {
+    tr_fprintf(stderr, ERROR, "File IO Error: %s\n", cfg->in_path);
+    return ERR_FILE_OPEN;
+  }
+
+  if (out == NULL) {
+    tr_fprintf(stderr, ERROR, "File IO Error: %s\n", cfg->out_path);
+    return ERR_FILE_OPEN;
+  }
   run_test(cfg, trial_file, out);
 
   close_output(out);

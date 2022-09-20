@@ -8,7 +8,7 @@ typedef enum Errors {
   ERR_TRIAL_PARSER_UNEXPECTED_END,
   ERR_TRIAL_PARSER_VALUE_ERROR,
   ERR_TRIAL_PARSER_KEY_ERROR,
-  ERR_FILE_READ_ERROR
+  ERR_FILE_OPEN
 } Errors;
 
 char *error_to_str(Errors err);

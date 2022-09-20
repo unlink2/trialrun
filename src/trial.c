@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 #include "macros.h"
 #include "trstring.h"
 #include "log.h"
@@ -17,21 +18,18 @@ typedef struct TrialParseResult {
   Errors err;
 } TrialParseResult;
 
-char *default_str_from(const char *d) {
-  char *s = malloc(strlen(d) + 1);
-  strncpy(s, d, strlen(d));
-  return s;
-}
-
 bool trial_is_end(char c) { return c == '\0' || c == '\n' || c == '\r'; }
 
 bool trial_bool_val(TrStr value, Errors *err) {
   *err = OK;
-  if (trstr_eq_raw(value, "true", 4)) {
+  if (trstr_eq_raw(value, "true")) {
     return TRUE;
-  } else if (trstr_eq_raw(value, "false", 5)) {
+  } else if (trstr_eq_raw(value, "false")) {
     return FALSE;
   } else {
+    char *failed_value = trstr_to_str(value);
+    tr_fprintf(stderr, ERROR, "Value Error: %s %d\n", failed_value, value.len);
+    free(failed_value);
     *err = ERR_TRIAL_PARSER_VALUE_ERROR;
     return FALSE;
   }
@@ -42,18 +40,66 @@ Errors trial_parse_handle(Trial *t, TrStr key, TrStr value) {
 
   // dumb check for each possible key
   // TODO there has to be a better way!
-  if (trstr_eq_raw(key, "echo", 4)) {
+  if (trstr_eq_raw(key, "echo")) {
     t->echo = trial_bool_val(value, &err);
+  } else if (trstr_eq_raw(key, "name")) {
+    t->name = trstr_to_str(value);
+  } else if (trstr_eq_raw(key, "command")) {
+    t->command = trstr_to_str(value);
+  } else if (trstr_eq_raw(key, "data")) {
+    t->data_path = trstr_to_str(value);
+  } else if (trstr_eq_raw(key, "expected")) {
+    t->expected_path = trstr_to_str(value);
+  } else if (trstr_eq_raw(key, "test-line-prefix")) {
+    t->test_line_prefix = trstr_to_str(value);
+  } else if (trstr_eq_raw(key, "begin")) {
+    t->begin = trstr_to_str(value);
+  } else if (trstr_eq_raw(key, "end")) {
+    t->end = trstr_to_str(value);
   } else {
+    char *failed_key = trstr_to_str(key);
+    tr_fprintf(stderr, ERROR, "Key error '%s'\n", failed_key);
+    free(failed_key);
     return ERR_TRIAL_PARSER_KEY_ERROR;
   }
 
   return err;
 }
 
+char* trial_skip_whitespace(char *input) {
+  // skip leading whitespaces 
+  while (isspace(input[0])) {
+    input++;
+  }
+
+  return input;
+}
+
+char* trial_skip_comment(char *input) {
+  input = trial_skip_whitespace(input);
+  while (input[0] == '#') {
+    // loop until next line 
+    while (input[0] != '\n' && !trial_is_end(input[0])) {
+      input++;
+    }
+    input = trial_skip_whitespace(input);
+  }
+  return input;
+}
+
 // parse the next trial input and return the end pointer
 TrialParseResult trial_parse_next(Trial *t, char *input) {
-  TrialParseResult r;
+  TrialParseResult r; 
+
+  input = trial_skip_whitespace(input);
+  input = trial_skip_comment(input);
+
+  if (input[0] == '\0') {
+    r.next = input;
+    r.err = OK;
+    return r;
+  }
+
   r.start = input; // start of line
 
   TrStr key = trstr_init(input, 0);
@@ -66,6 +112,7 @@ TrialParseResult trial_parse_next(Trial *t, char *input) {
 
   // if we did not find an = the file is invalid
   if (input[0] == '\0') {
+    tr_fprintf(stderr, ERROR, "Unexpected end: %s\n", input);
     r.next = input; // the char where the invalid state occured
     r.err = ERR_TRIAL_PARSER_UNEXPECTED_END;
     return r;
@@ -90,9 +137,9 @@ void trial_init(Trial *t) {
   memset(t, 0, sizeof(Trial));
 
   // set up defaults
-  t->begin = default_str_from(BEGIN);
-  t->end = default_str_from(END);
-  t->test_line_prefix = default_str_from("");
+  t->begin = str_from(BEGIN);
+  t->end = str_from(END);
+  t->test_line_prefix = str_from("");
 
   t->data_path = DEFAULT_PATH_OUT;
   t->echo = FALSE;
@@ -132,25 +179,28 @@ void trial_run(Trial *t, FILE *out) {
 
   FILE *pio = popen(t->command, "r"); // NOLINT
 
+  // read entire output of process 
+  
+
   int exit = pclose(pio);
 
   if (exit != 0) {
-    tr_fprintf(out, INFO, "[%s] Exit code is %d", t->name, exit);
+    tr_fprintf(out, INFO, "[%s] Exit code is %d\n", t->name, exit);
   }
 
   success = exit == 0;
 
-  tr_fprintf(out, OUTPUT, "[%s]\t%s\n", success ? "PASSED" : "FAILED", t->name);
+  tr_fprintf(out, OUTPUT, "[%s] %s\n", success ? "PASSED" : "FAILED", t->name);
 }
 
 void trial_print(Trial *t, FILE *f) {
-  tr_fprintf(f, DEBUG, "[NAME]: %s", t->name);
-  tr_fprintf(f, DEBUG, "[COMMAND]: %s", t->command);
-  tr_fprintf(f, DEBUG, "[BEGIN]: %s", t->begin);
-  tr_fprintf(f, DEBUG, "[END]: %s", t->end);
-  tr_fprintf(f, DEBUG, "[ECHO]: %d", t->echo);
-  tr_fprintf(f, DEBUG, "[DATA PATH]: %s", t->data_path);
-  tr_fprintf(f, DEBUG, "[LINE PREFIX]: %s", t->test_line_prefix);
+  tr_fprintf(f, DEBUG, "[NAME]: %s\n", t->name);
+  tr_fprintf(f, DEBUG, "[COMMAND]: %s\n", t->command);
+  tr_fprintf(f, DEBUG, "[BEGIN]: %s\n", t->begin);
+  tr_fprintf(f, DEBUG, "[END]: %s\n", t->end);
+  tr_fprintf(f, DEBUG, "[ECHO]: %d\n", t->echo);
+  tr_fprintf(f, DEBUG, "[DATA PATH]: %s\n", t->data_path);
+  tr_fprintf(f, DEBUG, "[LINE PREFIX]: %s\n", t->test_line_prefix);
 }
 
 void trial_free(Trial *trial) {

@@ -15,6 +15,12 @@ TrStr trstr_init(const char *s, const usize len);
 // Compare a trstr for equality
 bool trstr_eq(const TrStr left, const TrStr right);
 
-bool trstr_eq_raw(const TrStr left, const char *right, usize len);
+bool trstr_eq_raw(const TrStr left, const char *right);
+
+// create an owned C string copy from the input string
+char *str_from(const char *d);
+
+// convert a trstr to a malloced c-string
+char *trstr_to_str(const TrStr s);
 
 #endif
