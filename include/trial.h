@@ -34,6 +34,8 @@ void trial_init(Trial *t);
  */
 Trial trial_from(char *input);
 
+void trial_print(Trial *t, FILE *f);
+
 void trial_run(Trial *t, FILE *out);
 
 void trial_free(Trial *trial);

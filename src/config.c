@@ -20,16 +20,25 @@ FILE *open_output(Config *cfg) {
   return fopen(cfg->out_path, "we");
 }
 
-void close_outpiut(FILE *f) {
+void close_output(FILE *f) {
   if (f == stdout) {
     return;
   }
   fclose(f);
 }
 
-Errors run_tests(Config *cfg) { return OK; }
+Errors run_tests(Config *cfg) {
+  FILE *trial_file = fopen(cfg->in_path, "re");
+  FILE *out = open_output(cfg);
 
-Errors run_test(Config *cfg, FILE *f) {
+  run_test(cfg, trial_file, out);
+
+  close_output(out);
+  fclose(trial_file);
+  return OK;
+}
+
+Errors run_test(Config *cfg, FILE *f, FILE *out) {
   fseek(f, 0, SEEK_END);
   usize len = ftell(f);
   rewind(f);
@@ -41,10 +50,8 @@ Errors run_test(Config *cfg, FILE *f) {
   // the entire file is in buffer now
   // parse it!
 
-  FILE *out = open_output(cfg);
   Trial t = trial_from(buffer);
   trial_run(&t, out);
-  close_outpiut(out);
 
   free(buffer);
   return t.err;

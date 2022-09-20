@@ -28,12 +28,13 @@ void cfg_init(Config *cfg);
 
 // Re-open stdout to output path if path is not -
 FILE *open_output(Config *cfg);
+void close_output(FILE *f);
 
 // run all tests if path is a directory
 // or a single test if path is a file
 Errors run_tests(Config *cfg);
 
 // Run a single test
-Errors run_test(Config *cfg, FILE *f);
+Errors run_test(Config *cfg, FILE *f, FILE *out);
 
 #endif

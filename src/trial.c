@@ -38,7 +38,6 @@ bool trial_bool_val(TrStr value, Errors *err) {
 }
 
 Errors trial_parse_handle(Trial *t, TrStr key, TrStr value) {
-
   Errors err = OK;
 
   // dumb check for each possible key
@@ -127,6 +126,8 @@ void trial_run(Trial *t, FILE *out) {
     return;
   }
 
+  trial_print(t, out);
+
   bool success = TRUE;
 
   FILE *pio = popen(t->command, "r"); // NOLINT
@@ -140,6 +141,16 @@ void trial_run(Trial *t, FILE *out) {
   success = exit == 0;
 
   tr_fprintf(out, OUTPUT, "[%s]\t%s\n", success ? "PASSED" : "FAILED", t->name);
+}
+
+void trial_print(Trial *t, FILE *f) {
+  tr_fprintf(f, DEBUG, "[NAME]: %s", t->name);
+  tr_fprintf(f, DEBUG, "[COMMAND]: %s", t->command);
+  tr_fprintf(f, DEBUG, "[BEGIN]: %s", t->begin);
+  tr_fprintf(f, DEBUG, "[END]: %s", t->end);
+  tr_fprintf(f, DEBUG, "[ECHO]: %d", t->echo);
+  tr_fprintf(f, DEBUG, "[DATA PATH]: %s", t->data_path);
+  tr_fprintf(f, DEBUG, "[LINE PREFIX]: %s", t->test_line_prefix);
 }
 
 void trial_free(Trial *trial) {
