@@ -79,9 +79,11 @@ int main(int argc, char **argv) {
 #include "macros.h"
 #include "error.h"
 #include "trial.h"
+#include "buffer.h"
 
 int main(int argc, char **argv) {
-  const struct CMUnitTest tests[] = {cmocka_unit_test(test_trial_parse_next)};
+  const struct CMUnitTest tests[] = {cmocka_unit_test(test_trial_parse_next),
+                                     cmocka_unit_test(test_buffer_resize)};
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
 

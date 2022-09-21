@@ -30,4 +30,9 @@ void buffer_write(Buffer *buffer, char c);
 
 void buffer_free(Buffer *buffer);
 
+#ifdef TEST
+
+void test_buffer_resize(void **state);
+
+#endif
 #endif

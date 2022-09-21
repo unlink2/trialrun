@@ -48,3 +48,21 @@ void buffer_free(Buffer *buffer) {
     free(buffer->str.raw);
   }
 }
+
+#ifdef TEST
+
+#include "macros.h"
+
+void test_buffer_resize(void **state) {
+  Buffer b = buffer_init(4);
+
+  for (int i = 0; i < 10; i++) {
+    buffer_write(&b, '1' + i);
+  }
+
+  assert_true(trstr_eq_raw(b.str, "12345789"));
+
+  buffer_free(&b);
+}
+
+#endif
