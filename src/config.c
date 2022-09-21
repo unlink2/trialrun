@@ -53,7 +53,7 @@ char *file_read_all(FILE *f) {
   rewind(f);
 
   char *buffer = malloc(len + 1);
-  memset(buffer, 0, len);
+  memset(buffer, 0, len + 1);
 
   fread(buffer, len, 1, f);
   return buffer;
@@ -67,6 +67,7 @@ Errors run_test(Config *cfg, FILE *f, FILE *out) {
   Trial t = trial_from(buffer);
   trial_run(&t, out);
 
+  trial_free(&t);
   free(buffer);
   return t.err;
 }

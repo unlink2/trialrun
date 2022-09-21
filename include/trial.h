@@ -26,6 +26,13 @@ typedef struct Trial {
   Errors err;
 } Trial;
 
+typedef struct TrialState {
+  bool success;
+  int exit;
+} TrialState;
+
+void trial_state_init(TrialState *s);
+
 void trial_init(Trial *t);
 
 /**

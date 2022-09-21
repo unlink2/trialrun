@@ -18,6 +18,8 @@ typedef struct TrialParseResult {
   Errors err;
 } TrialParseResult;
 
+void trial_state_init(TrialState *s) { memset(s, 0, sizeof(TrialState)); }
+
 bool trial_is_end(char c) { return c == '\0' || c == '\n' || c == '\r'; }
 
 bool trial_bool_val(TrStr value, Errors *err) {
@@ -43,18 +45,25 @@ Errors trial_parse_handle(Trial *t, TrStr key, TrStr value) {
   if (trstr_eq_raw(key, "echo")) {
     t->echo = trial_bool_val(value, &err);
   } else if (trstr_eq_raw(key, "name")) {
+    free(t->name);
     t->name = trstr_to_str(value);
   } else if (trstr_eq_raw(key, "command")) {
+    free(t->command);
     t->command = trstr_to_str(value);
   } else if (trstr_eq_raw(key, "data")) {
+    free(t->data_path);
     t->data_path = trstr_to_str(value);
   } else if (trstr_eq_raw(key, "expected")) {
+    free(t->expected_path);
     t->expected_path = trstr_to_str(value);
   } else if (trstr_eq_raw(key, "test-line-prefix")) {
+    free(t->test_line_prefix);
     t->test_line_prefix = trstr_to_str(value);
   } else if (trstr_eq_raw(key, "begin")) {
+    free(t->begin);
     t->begin = trstr_to_str(value);
   } else if (trstr_eq_raw(key, "end")) {
+    free(t->end);
     t->end = trstr_to_str(value);
   } else {
     char *failed_key = trstr_to_str(key);
@@ -141,9 +150,9 @@ void trial_init(Trial *t) {
   t->end = str_from(END);
   t->test_line_prefix = str_from("");
 
-  t->data_path = DEFAULT_PATH_OUT;
+  t->data_path = str_from(DEFAULT_PATH_OUT);
   t->echo = FALSE;
-  t->expected_path = DEFAULT_PATH_IN;
+  t->expected_path = str_from(DEFAULT_PATH_IN);
 }
 
 Trial trial_from(char *input) {
@@ -173,25 +182,33 @@ void trial_run(Trial *t, FILE *out) {
     return;
   }
 
+  TrialState state;
+  trial_state_init(&state);
+
   trial_print(t, out);
 
-  bool success = TRUE;
+  state.success = TRUE;
 
   tr_fprintf(out, INFO, "[%s] Running '%s'...\n", t->name, t->command);
 
   FILE *pio = popen(t->command, "re"); // NOLINT
 
+  int b = 0;
   // read process output into buffer
+  while ((b = fgetc(pio)) != EOF) {
+    putc(b, stdout);
+  }
 
-  int exit = pclose(pio);
+  state.exit = pclose(pio);
 
-  if (exit != 0) {
+  if (state.exit != 0) {
     tr_fprintf(out, INFO, "[%s] Exit code is %d\n", t->name, exit);
   }
 
-  success = exit == 0;
+  state.success = state.exit == 0;
 
-  tr_fprintf(out, OUTPUT, "[%s] %s\n", success ? "PASSED" : "FAILED", t->name);
+  tr_fprintf(out, OUTPUT, "[%s] %s\n", state.success ? "PASSED" : "FAILED",
+             t->name);
 }
 
 void trial_print(Trial *t, FILE *f) {
@@ -212,6 +229,10 @@ void trial_free(Trial *trial) {
   free(trial->begin);
   free(trial->end);
   free(trial->test_line_prefix);
+  free(trial->data_path);
+  free(trial->command);
+  free(trial->name);
+  free(trial->expected_path);
 }
 
 #ifdef TEST
