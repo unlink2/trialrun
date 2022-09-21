@@ -29,6 +29,7 @@ typedef struct Trial {
 typedef struct TrialState {
   bool success;
   int exit;
+  bool begin;
 } TrialState;
 
 void trial_state_init(TrialState *s);
