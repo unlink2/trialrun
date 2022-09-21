@@ -6,9 +6,12 @@
 Buffer buffer_init(usize len) {
   Buffer buffer;
   memset(&buffer, 0, sizeof(Buffer));
+
   buffer.str.raw = malloc(len);
+  buffer.str.len = 0;
   memset(buffer.str.raw, 0, len);
-  buffer.str.len = len;
+
+  buffer.space = len;
   return buffer;
 }
 
