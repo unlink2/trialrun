@@ -194,7 +194,8 @@ void trial_run(Trial *t, FILE *out) {
   FILE *pio = popen(t->command, "re"); // NOLINT
 
   int b = 0;
-  // read process output into buffer
+  // read process output into buffer line by line
+  // and compare lines that match the comparison criteria
   while ((b = fgetc(pio)) != EOF) {
     putc(b, stdout);
   }

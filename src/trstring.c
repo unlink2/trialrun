@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-TrStr trstr_init(const char *s, const usize len) {
+TrStr trstr_init(char *s, const usize len) { // NOLINT
   TrStr n = {len, s};
 
   return n;
@@ -16,7 +16,7 @@ bool trstr_eq(const TrStr left, const TrStr right) {
   return strncmp(left.raw, right.raw, left.len) == 0;
 }
 
-bool trstr_eq_raw(const TrStr left, const char *right) {
+bool trstr_eq_raw(const TrStr left, char *right) {
   return trstr_eq(left, trstr_init(right, strlen(right)));
 }
 

@@ -5,17 +5,17 @@
 
 typedef struct TrStr {
   usize len;
-  const char *raw;
+  char *raw;
 } TrStr;
 
 // Create an unmanaged tr string from an existing pointer
 // You supply the data!
-TrStr trstr_init(const char *s, const usize len);
+TrStr trstr_init(char *s, const usize len);
 
 // Compare a trstr for equality
 bool trstr_eq(const TrStr left, const TrStr right);
 
-bool trstr_eq_raw(const TrStr left, const char *right);
+bool trstr_eq_raw(const TrStr left, char *right);
 
 // create an owned C string copy from the input string
 char *str_from(const char *d);
