@@ -11,7 +11,7 @@ typedef struct Buffer {
   TrStr str;
 
   // where is the buffer currently at?
-  usize space;
+  usize cap;
   Errors err;
 } Buffer;
 
