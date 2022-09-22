@@ -69,13 +69,13 @@ void test_strbuffer_resize(void **state) {
   assert_int_equal(0, b.str.len);
 
   for (int i = 0; i < 10; i++) {
-    strbuffer_write(&b, '1' + i);
+    strbuffer_write(&b, '0' + i);
   }
 
   // should have resized twice!
   assert_int_equal(16, b.cap);
-  assert_int_equal(9, b.str.len);
-  assert_true(str_eq_raw(b.str, "12345789"));
+  assert_int_equal(10, b.str.len);
+  assert_true(str_eq_raw(b.str, "0123456789"));
 
   strbuffer_free(&b);
 }
