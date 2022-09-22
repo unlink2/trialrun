@@ -23,14 +23,14 @@ void trial_state_init(TrialState *s) { memset(s, 0, sizeof(TrialState)); }
 
 bool trial_is_end(char c) { return c == '\0' || c == '\n' || c == '\r'; }
 
-bool trial_bool_val(TrStr value, Errors *err) {
+bool trial_bool_val(Str value, Errors *err) {
   *err = OK;
-  if (trstr_eq_raw(value, "true")) {
+  if (str_eq_raw(value, "true")) {
     return TRUE;
-  } else if (trstr_eq_raw(value, "false")) {
+  } else if (str_eq_raw(value, "false")) {
     return FALSE;
   } else {
-    char *failed_value = trstr_to_str(value);
+    char *failed_value = str_to_str(value);
     tr_fprintf(stderr, ERROR, "Value Error: %s %d\n", failed_value, value.len);
     free(failed_value);
     *err = ERR_TRIAL_PARSER_VALUE_ERROR;
@@ -38,36 +38,36 @@ bool trial_bool_val(TrStr value, Errors *err) {
   }
 }
 
-Errors trial_parse_handle(Trial *t, TrStr key, TrStr value) {
+Errors trial_parse_handle(Trial *t, Str key, Str value) {
   Errors err = OK;
 
   // dumb check for each possible key
   // TODO there has to be a better way!
-  if (trstr_eq_raw(key, "echo")) {
+  if (str_eq_raw(key, "echo")) {
     t->echo = trial_bool_val(value, &err);
-  } else if (trstr_eq_raw(key, "name")) {
+  } else if (str_eq_raw(key, "name")) {
     free(t->name);
-    t->name = trstr_to_str(value);
-  } else if (trstr_eq_raw(key, "command")) {
+    t->name = str_to_str(value);
+  } else if (str_eq_raw(key, "command")) {
     free(t->command);
-    t->command = trstr_to_str(value);
-  } else if (trstr_eq_raw(key, "data")) {
+    t->command = str_to_str(value);
+  } else if (str_eq_raw(key, "data")) {
     free(t->data_path);
-    t->data_path = trstr_to_str(value);
-  } else if (trstr_eq_raw(key, "expected")) {
+    t->data_path = str_to_str(value);
+  } else if (str_eq_raw(key, "expected")) {
     free(t->expected_path);
-    t->expected_path = trstr_to_str(value);
-  } else if (trstr_eq_raw(key, "test-line-prefix")) {
+    t->expected_path = str_to_str(value);
+  } else if (str_eq_raw(key, "test-line-prefix")) {
     free(t->test_line_prefix);
-    t->test_line_prefix = trstr_to_str(value);
-  } else if (trstr_eq_raw(key, "begin")) {
+    t->test_line_prefix = str_to_str(value);
+  } else if (str_eq_raw(key, "begin")) {
     free(t->begin);
-    t->begin = trstr_to_str(value);
-  } else if (trstr_eq_raw(key, "end")) {
+    t->begin = str_to_str(value);
+  } else if (str_eq_raw(key, "end")) {
     free(t->end);
-    t->end = trstr_to_str(value);
+    t->end = str_to_str(value);
   } else {
-    char *failed_key = trstr_to_str(key);
+    char *failed_key = str_to_str(key);
     tr_fprintf(stderr, ERROR, "Key error '%s'\n", failed_key);
     free(failed_key);
     return ERR_TRIAL_PARSER_KEY_ERROR;
@@ -112,7 +112,7 @@ TrialParseResult trial_parse_next(Trial *t, char *input) {
 
   r.start = input; // start of line
 
-  TrStr key = trstr_init(input, 0);
+  Str key = str_init(input, 0);
 
   // get key until = or end of line
   while (input[0] != DELIM && !trial_is_end(input[0])) {
@@ -129,7 +129,7 @@ TrialParseResult trial_parse_next(Trial *t, char *input) {
   }
 
   // otherwise we now have a key
-  TrStr value = trstr_init(++input, 0); // char after = is start of value
+  Str value = str_init(++input, 0); // char after = is start of value
 
   // obtain value
   while (!trial_is_end(input[0])) {

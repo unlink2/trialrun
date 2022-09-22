@@ -75,7 +75,7 @@ void test_strbuffer_resize(void **state) {
   // should have resized twice!
   assert_int_equal(16, b.cap);
   assert_int_equal(9, b.str.len);
-  assert_true(trstr_eq_raw(b.str, "12345789"));
+  assert_true(str_eq_raw(b.str, "12345789"));
 
   strbuffer_free(&b);
 }

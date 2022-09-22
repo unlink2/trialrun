@@ -6,9 +6,9 @@
 #include "types.h"
 
 // A buffer is an expanding wrapper
-// around TrStr that allows auto-resizing
+// around Str that allows auto-resizing
 typedef struct StrBuffer {
-  TrStr str;
+  Str str;
 
   // where is the buffer currently at?
   usize cap;
