@@ -201,6 +201,7 @@ int trial_read_line_from(FILE *f, FILE *out, StrBuffer *buffer, bool echo) {
 }
 
 TrialState trial_run(Trial *t, FILE *out) {
+  Config *cfg = cfg();
   TrialState state;
   trial_state_init(&state);
   if (t->err) {
@@ -211,7 +212,7 @@ TrialState trial_run(Trial *t, FILE *out) {
 
   state.success = TRUE;
 
-  tr_fprintf(out, INFO, "[%s] Running '%s'...\n", t->name, t->command);
+  tr_fprintf(out, OUTPUT, "[%s] Running '%s'\n", t->name, t->command);
 
   FILE *pio = popen(t->command, "re"); // NOLINT
   FILE *eio = fopen(t->expected_path, "re");
@@ -228,7 +229,7 @@ TrialState trial_run(Trial *t, FILE *out) {
 
   usize line = 1;
 
-  while (trial_read_line_from(pio, out, &input, t->echo) != EOF) {
+  while (trial_read_line_from(pio, out, &input, t->echo || cfg->log_level >= LOG_LEVEL_LEN) != EOF) {
     if (!str_starts_with_raw(input.str, t->test_line_prefix)) {
       continue;
     }
@@ -274,8 +275,7 @@ TrialState trial_run(Trial *t, FILE *out) {
     tr_fprintf(stderr, ERROR, "[%s] %s\n", t->name, error_to_str(state.err));
   }
 
-  tr_fprintf(out, OUTPUT, "[%s] %s\n", state.success ? "PASSED" : "FAILED",
-             t->name);
+  tr_fprintf(out, OUTPUT, "[%s] %s\n", t->name, state.success ? "PASSED" : "FAILED");
 
   return state;
 }
