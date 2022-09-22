@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
 
 int main(int argc, char **argv) {
   const struct CMUnitTest tests[] = {cmocka_unit_test(test_trial_parse_next),
-                                     cmocka_unit_test(test_buffer_resize)};
+                                     cmocka_unit_test(test_strbuffer_resize)};
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
 

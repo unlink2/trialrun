@@ -7,32 +7,34 @@
 
 // A buffer is an expanding wrapper
 // around TrStr that allows auto-resizing
-typedef struct Buffer {
+typedef struct StrBuffer {
   TrStr str;
 
   // where is the buffer currently at?
   usize cap;
   Errors err;
-} Buffer;
+} StrBuffer;
 
-Buffer buffer_init();
+StrBuffer strbuffer_init();
 
 // Resize buffer and copy from old to new location
-void buffer_resize(Buffer *buffer, usize len);
+void strbuffer_resize(StrBuffer *buffer, usize len);
 
 // get next len for buffer
-usize buffer_next_len(Buffer *buffer);
+usize strbuffer_next_len(StrBuffer *buffer);
 
 // Returns true if the next wite would overflow the buffer
-bool buffer_full(Buffer *buffer);
+bool strbuffer_full(StrBuffer *buffer);
 
-void buffer_write(Buffer *buffer, char c);
+void strbuffer_write(StrBuffer *buffer, char c);
 
-void buffer_free(Buffer *buffer);
+void strbuffer_append_raw(StrBuffer *buffer, char *s);
+
+void strbuffer_free(StrBuffer *buffer);
 
 #ifdef TEST
 
-void test_buffer_resize(void **state);
+void test_strbuffer_resize(void **state);
 
 #endif
 #endif
