@@ -33,3 +33,17 @@ char *trstr_to_str(const TrStr s) {
 
   return n;
 }
+
+bool trstr_starts_with_raw(const TrStr s, char *with) {
+  usize len = strlen(with);
+  if (s.len < len) {
+    return FALSE;
+  }
+
+  // now we just init 2 trstrings with the lenght of with and
+  // then compare
+  TrStr s1 = trstr_init(s.raw, len);
+  TrStr s2 = trstr_init(with, len);
+
+  return trstr_eq(s1, s2);
+}

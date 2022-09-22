@@ -178,7 +178,7 @@ Trial trial_from(char *input) {
   return trial;
 }
 
-int trial_read_from(FILE *f, FILE *out, StrBuffer *buffer, bool echo) {
+int trial_read_line_from(FILE *f, FILE *out, StrBuffer *buffer, bool echo) {
   int b = 0;
   // read process output into buffer line by line
   // and compare lines that match the comparison criteria
@@ -186,6 +186,13 @@ int trial_read_from(FILE *f, FILE *out, StrBuffer *buffer, bool echo) {
     if (echo) {
       putc(b, out);
     }
+
+    // this will also catch \r\n
+    if (b == '\n') {
+      break;
+    }
+
+    strbuffer_write(buffer, (char)b);
   }
 
   // return last byte, if it is EOF the caller will know
@@ -211,7 +218,8 @@ void trial_run(Trial *t, FILE *out) {
   StrBuffer input = strbuffer_init(32);
   StrBuffer expected = strbuffer_init(32);
 
-  trial_read_from(pio, out, &input, t->echo);
+  while (trial_read_line_from(pio, out, &input, t->echo) != EOF) {
+  }
 
   strbuffer_free(&input);
   strbuffer_free(&expected);

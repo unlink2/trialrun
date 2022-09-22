@@ -23,4 +23,6 @@ char *str_from(const char *d);
 // convert a trstr to a malloced c-string
 char *trstr_to_str(const TrStr s);
 
+bool trstr_starts_with_raw(const TrStr s, char *with);
+
 #endif

@@ -1,17 +1,17 @@
 # lines starting wtih # are comments 
 
 name=basic example
-command=echo "test"
+command=printf "_test\n123\n_echo\n"
 
 # files called '-' are treated as stdin or stdout depending on context 
 # read test data from stdout (starting at 'begin' and ending at 'end')  
 data=- 
 
 # expected output 
-expected=expected.txt 
+expected=example/basic.txt 
 
 # it is possible to only test lines that begin with a prefix 
-test-line-prefix=__test
+test-line-prefix=_
 
 # begin and end string can be changed if needed 
 begin====BEGIN=== 
