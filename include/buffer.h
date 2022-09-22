@@ -2,7 +2,7 @@
 #define BUFFER_H_
 
 #include "error.h"
-#include "trstring.h"
+#include "str.h"
 #include "types.h"
 
 // A buffer is an expanding wrapper

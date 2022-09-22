@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "macros.h"
-#include "trstring.h"
+#include "str.h"
 #include "log.h"
 #include "buffer.h"
 

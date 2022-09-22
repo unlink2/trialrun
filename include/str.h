@@ -1,5 +1,5 @@
-#ifndef TRSTRING_H_
-#define TRSTRING_H_
+#ifndef STR_H_
+#define STR_H_
 
 #include "types.h"
 
