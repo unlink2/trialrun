@@ -50,6 +50,8 @@ void strbuffer_append_raw(StrBuffer *buffer, char *s) {
   }
 }
 
+void strbuffer_clear(StrBuffer *buffer) { buffer->str.len = 0; }
+
 void strbuffer_free(StrBuffer *buffer) {
   if (buffer->str.raw) {
     free(buffer->str.raw);

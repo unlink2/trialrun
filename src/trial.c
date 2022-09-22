@@ -7,6 +7,7 @@
 #include "macros.h"
 #include "trstring.h"
 #include "log.h"
+#include "buffer.h"
 
 #define BEGIN "===BEGIN"
 #define END "===END"
@@ -177,6 +178,20 @@ Trial trial_from(char *input) {
   return trial;
 }
 
+int trial_read_from(FILE *f, FILE *out, StrBuffer *buffer, bool echo) {
+  int b = 0;
+  // read process output into buffer line by line
+  // and compare lines that match the comparison criteria
+  while ((b = fgetc(f)) != EOF) {
+    if (echo) {
+      putc(b, out);
+    }
+  }
+
+  // return last byte, if it is EOF the caller will know
+  return b;
+}
+
 void trial_run(Trial *t, FILE *out) {
   if (t->err) {
     return;
@@ -193,12 +208,13 @@ void trial_run(Trial *t, FILE *out) {
 
   FILE *pio = popen(t->command, "re"); // NOLINT
 
-  int b = 0;
-  // read process output into buffer line by line
-  // and compare lines that match the comparison criteria
-  while ((b = fgetc(pio)) != EOF) {
-    putc(b, stdout);
-  }
+  StrBuffer input = strbuffer_init(32);
+  StrBuffer expected = strbuffer_init(32);
+
+  trial_read_from(pio, out, &input, t->echo);
+
+  strbuffer_free(&input);
+  strbuffer_free(&expected);
 
   state.exit = pclose(pio);
 

@@ -18,4 +18,4 @@ begin====BEGIN===
 end====END===
 
 # echo stdout of command back 
-echo=false
+echo=true

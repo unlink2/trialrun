@@ -15,7 +15,7 @@ typedef struct StrBuffer {
   Errors err;
 } StrBuffer;
 
-StrBuffer strbuffer_init();
+StrBuffer strbuffer_init(usize len);
 
 // Resize buffer and copy from old to new location
 void strbuffer_resize(StrBuffer *buffer, usize len);
@@ -29,6 +29,8 @@ bool strbuffer_full(StrBuffer *buffer);
 void strbuffer_write(StrBuffer *buffer, char c);
 
 void strbuffer_append_raw(StrBuffer *buffer, char *s);
+
+void strbuffer_clear(StrBuffer *buffer);
 
 void strbuffer_free(StrBuffer *buffer);
 
