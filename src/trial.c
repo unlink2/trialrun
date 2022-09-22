@@ -179,6 +179,7 @@ Trial trial_from(char *input) {
 }
 
 int trial_read_line_from(FILE *f, FILE *out, StrBuffer *buffer, bool echo) {
+  strbuffer_clear(buffer);
   int b = 0;
   // read process output into buffer line by line
   // and compare lines that match the comparison criteria
@@ -199,13 +200,12 @@ int trial_read_line_from(FILE *f, FILE *out, StrBuffer *buffer, bool echo) {
   return b;
 }
 
-void trial_run(Trial *t, FILE *out) {
-  if (t->err) {
-    return;
-  }
-
+TrialState trial_run(Trial *t, FILE *out) {
   TrialState state;
   trial_state_init(&state);
+  if (t->err) {
+    return state;
+  }
 
   trial_print(t, out);
 
@@ -214,26 +214,70 @@ void trial_run(Trial *t, FILE *out) {
   tr_fprintf(out, INFO, "[%s] Running '%s'...\n", t->name, t->command);
 
   FILE *pio = popen(t->command, "re"); // NOLINT
+  FILE *eio = fopen(t->expected_path, "re");
+
+  if (!pio || !eio) {
+    tr_fprintf(stderr, ERROR, "[%s] Unable to open expected file '%s'!\n",
+               t->name, t->expected_path);
+    state.err = ERR_FILE_OPEN;
+    return state;
+  }
 
   StrBuffer input = strbuffer_init(32);
   StrBuffer expected = strbuffer_init(32);
 
+  usize line = 1;
+
   while (trial_read_line_from(pio, out, &input, t->echo) != EOF) {
+    if (!str_starts_with_raw(input.str, t->test_line_prefix)) {
+      continue;
+    }
+
+    // if there is no more test data it is an automatic failure
+    if (trial_read_line_from(eio, out, &expected, FALSE) == EOF) {
+      state.err = ERR_TRIAL_UNEXPECTED_DATA_END;
+      break;
+    }
+
+    // otherwise we can compare!
+    if (!str_eq(input.str, expected.str)) {
+      tr_fprintf(out, ERROR, "[%s] Failure in expected line %d: '", t->name, line);
+      str_print(out, expected.str);
+      tr_fprintf(out, ERROR, "' != ' ");
+      str_print(out, input.str);
+      tr_fprintf(out, ERROR, "'\n");
+      state.err = ERR_TRIAL_FAILURE;
+      break;
+    }
+
+    line++;
+  }
+
+  // lastly, the input data should now be EOF! if not we have an error
+  if (trial_read_line_from(eio, out, &expected, FALSE) != EOF) {
+    state.err = ERR_PROCESS_UNEXPECTED_DATE_END;
   }
 
   strbuffer_free(&input);
   strbuffer_free(&expected);
 
   state.exit = pclose(pio);
+  fclose(eio);
 
   if (state.exit != 0) {
     tr_fprintf(out, INFO, "[%s] Exit code is %d\n", t->name, exit);
   }
 
-  state.success = state.exit == 0;
+  state.success = state.exit == 0 && state.err == OK;
+
+  if (!state.success) {
+    tr_fprintf(stderr, ERROR, "[%s] %s\n", t->name, error_to_str(state.err));
+  }
 
   tr_fprintf(out, OUTPUT, "[%s] %s\n", state.success ? "PASSED" : "FAILED",
              t->name);
+
+  return state;
 }
 
 void trial_print(Trial *t, FILE *f) {

@@ -3,7 +3,7 @@
 #include <string.h>
 
 Str str_init(char *s, const usize len) { // NOLINT
-  Str n = {len, s};
+  Str n = {s, len};
 
   return n;
 }
@@ -39,11 +39,16 @@ bool str_starts_with_raw(const Str s, char *with) {
   if (s.len < len) {
     return FALSE;
   }
-
   // now we just init 2 strings with the lenght of with and
   // then compare
   Str s1 = str_init(s.raw, len);
   Str s2 = str_init(with, len);
 
   return str_eq(s1, s2);
+}
+
+void str_print(FILE *f, const Str s) {
+  for (int i = 0; i < s.len; i++) {
+    fputc(s.raw[i], f);
+  }
 }

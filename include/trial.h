@@ -30,6 +30,7 @@ typedef struct TrialState {
   bool success;
   int exit;
   bool begin;
+  Errors err;
 } TrialState;
 
 void trial_state_init(TrialState *s);
@@ -44,7 +45,7 @@ Trial trial_from(char *input);
 
 void trial_print(Trial *t, FILE *f);
 
-void trial_run(Trial *t, FILE *out);
+TrialState trial_run(Trial *t, FILE *out);
 
 void trial_free(Trial *trial);
 

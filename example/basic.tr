@@ -8,7 +8,7 @@ command=printf "_test\n123\n_echo\n"
 data=- 
 
 # expected output 
-expected=example/basic.txt 
+expected=example/basic.txt
 
 # it is possible to only test lines that begin with a prefix 
 test-line-prefix=_

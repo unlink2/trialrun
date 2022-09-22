@@ -2,10 +2,11 @@
 #define STR_H_
 
 #include "types.h"
+#include <stdio.h>
 
 typedef struct Str {
-  usize len;
   char *raw;
+  usize len;
 } Str;
 
 // Create an unmanaged tr string from an existing pointer
@@ -24,5 +25,7 @@ char *str_from(const char *d);
 char *str_to_str(const Str s);
 
 bool str_starts_with_raw(const Str s, char *with);
+
+void str_print(FILE *f, const Str s);
 
 #endif
