@@ -1,0 +1,21 @@
+# lines starting wtih # are comments 
+
+name=basic example
+command=./build/trialrun ./example/basic.tr
+
+# files called '-' are treated as stdin or stdout depending on context 
+# read test data from stdout (starting at 'begin' and ending at 'end')  
+data=- 
+
+# expected output 
+expected=./tests/basic.txt
+
+# it is possible to only test lines that begin with a prefix 
+test-line-prefix=
+
+# begin and end string can be changed if needed 
+begin====BEGIN=== 
+end====END===
+
+# echo stdout of command back 
+echo=false

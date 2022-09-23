@@ -1,0 +1,2 @@
+[basic example] Running 'printf "_test\n123\n_echo\n"'
+[basic example] PASSED

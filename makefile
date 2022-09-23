@@ -75,6 +75,12 @@ test:
 	make build_test BUILD_DIR=$(BUILD_DIR_TEST) 
 	make run TARGET_EXEC=$(TEST_EXEC) BUILD_DIR=$(BUILD_DIR_TEST) TYPE=bin
 
+# run integration tests 
+.PHONY: int
+int:
+	make 
+	trialrun tests/*.tr
+
 # Run task 
 .PHONY: run
 run:
