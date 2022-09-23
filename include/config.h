@@ -16,6 +16,7 @@ typedef struct Config {
 
   char *in_path;
   char *out_path;
+  Error overall;
 } Config;
 
 extern Config global_cfg;

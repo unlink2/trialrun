@@ -21,7 +21,7 @@ static char args_doc[] = "";
 
 static struct argp_option options[] = {
     {"verbose", 'v', NULL, 0, "Enable verbose output"},
-    {"input", 'i', "PATH", 0, "The input trialrun file or directory"},
+    // {"input", 'i', "PATH", 0, "The input trialrun file or directory"},
     {"output", 'o', "PATH", 0, "The output file"},
     {0}};
 
@@ -31,23 +31,25 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
   case 'v':
     cfg->log_level = LOG_LEVEL_LEN;
     break;
-  case 'i':
-    cfg->in_path = arg;
-    break;
   case 'o':
     cfg->out_path = arg;
     break;
   case ARGP_KEY_ARG:
-    if (state->arg_num >= 0) {
-      /* Too many arguments. */
-      argp_usage(state); // NOLINT
-    }
+    /*
+      if (state->arg_num >= 0) {
+        // Too many arguments
+        argp_usage(state); // NOLINT
+      }
 
-    // arguments->args[state->arg_num] = arg;
+      // arguments->args[state->arg_num] = arg;
+    */
 
+    // all args are a single trial, just parse them until we are out of args
+    cfg->in_path = arg;
+    cfg->overall |= run_tests(cfg);
     break;
   case ARGP_KEY_END:
-    if (state->arg_num < 0) {
+    if (state->arg_num < 1) {
       /* Not enough arguments. */
       argp_usage(state); // NOLINT
     }
@@ -65,7 +67,7 @@ int main(int argc, char **argv) {
   cfg_init(cfg);
   argp_parse(&argp, argc, argv, 0, 0, cfg); // NOLINT
 
-  return run_tests(cfg);
+  return cfg->overall;
 }
 
 #endif
