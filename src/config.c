@@ -27,7 +27,7 @@ void close_output(FILE *f) {
   fclose(f);
 }
 
-Errors run_tests(Config *cfg) {
+Error run_tests(Config *cfg) {
   FILE *trial_file = fopen(cfg->in_path, "re");
   FILE *out = open_output(cfg);
 
@@ -59,7 +59,7 @@ char *file_read_all(FILE *f) {
   return buffer;
 }
 
-Errors run_test(Config *cfg, FILE *f, FILE *out) {
+Error run_test(Config *cfg, FILE *f, FILE *out) {
   char *buffer = file_read_all(f);
   // the entire file is in buffer now
   // parse it!

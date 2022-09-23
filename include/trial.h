@@ -23,14 +23,14 @@ typedef struct Trial {
 
   bool echo;
 
-  Errors err;
+  Error err;
 } Trial;
 
 typedef struct TrialState {
   bool success;
   int exit;
   bool begin;
-  Errors err;
+  Error err;
 } TrialState;
 
 void trial_state_init(TrialState *s);

@@ -16,14 +16,14 @@
 typedef struct TrialParseResult {
   char *start;
   char *next;
-  Errors err;
+  Error err;
 } TrialParseResult;
 
 void trial_state_init(TrialState *s) { memset(s, 0, sizeof(TrialState)); }
 
 bool trial_is_end(char c) { return c == '\0' || c == '\n' || c == '\r'; }
 
-bool trial_bool_val(Str value, Errors *err) {
+bool trial_bool_val(Str value, Error *err) {
   *err = OK;
   if (str_eq_raw(value, "true")) {
     return TRUE;
@@ -38,8 +38,8 @@ bool trial_bool_val(Str value, Errors *err) {
   }
 }
 
-Errors trial_parse_handle(Trial *t, Str key, Str value) {
-  Errors err = OK;
+Error trial_parse_handle(Trial *t, Str key, Str value) {
+  Error err = OK;
 
   // dumb check for each possible key
   // TODO there has to be a better way!

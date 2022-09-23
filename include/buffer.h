@@ -12,7 +12,7 @@ typedef struct StrBuffer {
 
   // where is the buffer currently at?
   usize cap;
-  Errors err;
+  Error err;
 } StrBuffer;
 
 StrBuffer strbuffer_init(usize len);

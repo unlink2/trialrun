@@ -34,9 +34,9 @@ char *file_read_all(FILE *f);
 
 // run all tests if path is a directory
 // or a single test if path is a file
-Errors run_tests(Config *cfg);
+Error run_tests(Config *cfg);
 
 // Run a single test
-Errors run_test(Config *cfg, FILE *f, FILE *out);
+Error run_test(Config *cfg, FILE *f, FILE *out);
 
 #endif

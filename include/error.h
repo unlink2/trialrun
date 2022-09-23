@@ -1,7 +1,7 @@
 #ifndef ERROR_H_
 #define ERROR_H_
 
-typedef enum Errors {
+typedef enum Error {
   OK,
   ERR_BUFFER,
   ERR_UNKNOWN,
@@ -12,8 +12,8 @@ typedef enum Errors {
   ERR_TRIAL_UNEXPECTED_DATA_END,
   ERR_PROCESS_UNEXPECTED_DATE_END,
   ERR_TRIAL_FAILURE,
-} Errors;
+} Error;
 
-char *error_to_str(Errors err);
+char *error_to_str(Error err);
 
 #endif

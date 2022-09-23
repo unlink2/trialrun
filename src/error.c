@@ -1,6 +1,6 @@
 #include "error.h"
 
-char *error_to_str(Errors err) {
+char *error_to_str(Error err) {
   switch (err) {
   case ERR_BUFFER:
     return "Buffer error";
