@@ -6,8 +6,8 @@
 #include <ctype.h>
 #include "macros.h"
 #include "str.h"
-#include "log.h"
 #include "buffer.h"
+#include <scl.h>
 
 #define BEGIN "===BEGIN"
 #define END "===END"
@@ -31,7 +31,8 @@ bool trial_bool_val(Str value, Error *err) {
     return FALSE;
   } else {
     char *failed_value = str_to_str(value);
-    tr_fprintf(stderr, ERROR, "Value Error: %s %d\n", failed_value, value.len);
+    scl_log_fprintf(stderr, ERROR, "Value Error: %s %d\n", failed_value,
+                    value.len);
     free(failed_value);
     *err = ERR_TRIAL_PARSER_VALUE_ERROR;
     return FALSE;
@@ -68,7 +69,7 @@ Error trial_parse_handle(Trial *t, Str key, Str value) {
     t->end = str_to_str(value);
   } else {
     char *failed_key = str_to_str(key);
-    tr_fprintf(stderr, ERROR, "Key error '%s'\n", failed_key);
+    scl_log_fprintf(stderr, ERROR, "Key error '%s'\n", failed_key);
     free(failed_key);
     return ERR_TRIAL_PARSER_KEY_ERROR;
   }
@@ -122,7 +123,7 @@ TrialParseResult trial_parse_next(Trial *t, char *input) {
 
   // if we did not find an = the file is invalid
   if (input[0] == '\0') {
-    tr_fprintf(stderr, ERROR, "Unexpected end: %s\n", input);
+    scl_log_fprintf(stderr, ERROR, "Unexpected end: %s\n", input);
     r.next = input; // the char where the invalid state occured
     r.err = ERR_TRIAL_PARSER_UNEXPECTED_END;
     return r;
@@ -212,14 +213,14 @@ TrialState trial_run(Trial *t, FILE *out) {
 
   state.success = TRUE;
 
-  tr_fprintf(out, OUTPUT, "[%s] Running '%s'\n", t->name, t->command);
+  scl_log_fprintf(out, OUTPUT, "[%s] Running '%s'\n", t->name, t->command);
 
   FILE *pio = popen(t->command, "re"); // NOLINT
   FILE *eio = fopen(t->expected_path, "re");
 
   if (!pio || !eio) {
-    tr_fprintf(stderr, ERROR, "[%s] Unable to open expected file '%s'!\n",
-               t->name, t->expected_path);
+    scl_log_fprintf(stderr, ERROR, "[%s] Unable to open expected file '%s'!\n",
+                    t->name, t->expected_path);
     state.err = ERR_FILE_OPEN;
     return state;
   }
@@ -229,7 +230,9 @@ TrialState trial_run(Trial *t, FILE *out) {
 
   usize line = 1;
 
-  while (trial_read_line_from(pio, out, &input, t->echo || cfg->log_level >= LOG_LEVEL_LEN) != EOF) {
+  while (trial_read_line_from(pio, out, &input,
+                              t->echo || cfg->log_level >= LOG_LEVEL_LEN) !=
+         EOF) {
     if (!str_starts_with_raw(input.str, t->test_line_prefix)) {
       continue;
     }
@@ -242,11 +245,12 @@ TrialState trial_run(Trial *t, FILE *out) {
 
     // otherwise we can compare!
     if (!str_eq(input.str, expected.str)) {
-      tr_fprintf(out, ERROR, "[%s] Failure in expected line %d: '", t->name, line);
+      scl_log_fprintf(out, ERROR, "[%s] Failure in expected line %d: '",
+                      t->name, line);
       str_print(out, expected.str);
-      tr_fprintf(out, ERROR, "' != ' ");
+      scl_log_fprintf(out, ERROR, "' != ' ");
       str_print(out, input.str);
-      tr_fprintf(out, ERROR, "'\n");
+      scl_log_fprintf(out, ERROR, "'\n");
       state.err = ERR_TRIAL_FAILURE;
       break;
     }
@@ -266,28 +270,30 @@ TrialState trial_run(Trial *t, FILE *out) {
   fclose(eio);
 
   if (state.exit != 0) {
-    tr_fprintf(out, INFO, "[%s] Exit code is %d\n", t->name, exit);
+    scl_log_fprintf(out, INFO, "[%s] Exit code is %d\n", t->name, exit);
   }
 
   state.success = state.exit == 0 && state.err == OK;
 
   if (!state.success) {
-    tr_fprintf(stderr, ERROR, "[%s] %s\n", t->name, error_to_str(state.err));
+    scl_log_fprintf(stderr, ERROR, "[%s] %s\n", t->name,
+                    error_to_str(state.err));
   }
 
-  tr_fprintf(out, OUTPUT, "[%s] %s\n", t->name, state.success ? "PASSED" : "FAILED");
+  scl_log_fprintf(out, OUTPUT, "[%s] %s\n", t->name,
+                  state.success ? "PASSED" : "FAILED");
 
   return state;
 }
 
 void trial_print(Trial *t, FILE *f) {
-  tr_fprintf(f, DEBUG, "[NAME]: %s\n", t->name);
-  tr_fprintf(f, DEBUG, "[COMMAND]: %s\n", t->command);
-  tr_fprintf(f, DEBUG, "[BEGIN]: %s\n", t->begin);
-  tr_fprintf(f, DEBUG, "[END]: %s\n", t->end);
-  tr_fprintf(f, DEBUG, "[ECHO]: %d\n", t->echo);
-  tr_fprintf(f, DEBUG, "[DATA PATH]: %s\n", t->data_path);
-  tr_fprintf(f, DEBUG, "[LINE PREFIX]: %s\n", t->test_line_prefix);
+  scl_log_fprintf(f, DEBUG, "[NAME]: %s\n", t->name);
+  scl_log_fprintf(f, DEBUG, "[COMMAND]: %s\n", t->command);
+  scl_log_fprintf(f, DEBUG, "[BEGIN]: %s\n", t->begin);
+  scl_log_fprintf(f, DEBUG, "[END]: %s\n", t->end);
+  scl_log_fprintf(f, DEBUG, "[ECHO]: %d\n", t->echo);
+  scl_log_fprintf(f, DEBUG, "[DATA PATH]: %s\n", t->data_path);
+  scl_log_fprintf(f, DEBUG, "[LINE PREFIX]: %s\n", t->test_line_prefix);
 }
 
 void trial_free(Trial *trial) {

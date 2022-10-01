@@ -1,9 +1,9 @@
 #include "config.h"
-#include "log.h"
 #include "trial.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <scl.h>
 
 Config global_cfg;
 
@@ -11,6 +11,7 @@ void cfg_init(Config *cfg) {
   cfg->log_level = ERROR;
   cfg->in_path = DEFAULT_PATH_IN;
   cfg->out_path = DEFAULT_PATH_OUT;
+  scl_log_set_level(cfg->log_level);
 }
 
 FILE *open_output(Config *cfg) {
@@ -32,12 +33,12 @@ Error run_tests(Config *cfg) {
   FILE *out = open_output(cfg);
 
   if (trial_file == NULL) {
-    tr_fprintf(stderr, ERROR, "File IO Error: %s\n", cfg->in_path);
+    scl_log_fprintf(stderr, ERROR, "File IO Error: %s\n", cfg->in_path);
     return ERR_FILE_OPEN;
   }
 
   if (out == NULL) {
-    tr_fprintf(stderr, ERROR, "File IO Error: %s\n", cfg->out_path);
+    scl_log_fprintf(stderr, ERROR, "File IO Error: %s\n", cfg->out_path);
     return ERR_FILE_OPEN;
   }
   run_test(cfg, trial_file, out);

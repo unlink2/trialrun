@@ -3,8 +3,9 @@
  * When built without test
  */
 #include "config.h"
-#include "log.h"
 #include <string.h>
+#include <scl.h>
+
 #ifndef TEST
 
 /// only use main if binary
@@ -30,6 +31,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
   switch (key) {
   case 'v':
     cfg->log_level = LOG_LEVEL_LEN;
+    scl_log_set_level(cfg->log_level);
     break;
   case 'o':
     cfg->out_path = arg;
