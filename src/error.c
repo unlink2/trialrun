@@ -2,8 +2,6 @@
 
 char *error_to_str(Error err) {
   switch (err) {
-  case ERR_BUFFER:
-    return "Buffer error";
   case ERR_TRIAL_PARSER_KEY_ERROR:
     return "Key error";
   case ERR_TRIAL_PARSER_VALUE_ERROR:

@@ -6,7 +6,6 @@
 #include <ctype.h>
 #include "macros.h"
 #include "str.h"
-#include "buffer.h"
 #include <scl.h>
 
 #define BEGIN "===BEGIN"
@@ -180,7 +179,7 @@ Trial trial_from(char *input) {
 }
 
 int trial_read_line_from(FILE *f, FILE *out, StrBuffer *buffer, bool echo) {
-  strbuffer_clear(buffer);
+  strbuf_clear(buffer);
   int b = 0;
   // read process output into buffer line by line
   // and compare lines that match the comparison criteria
@@ -194,7 +193,7 @@ int trial_read_line_from(FILE *f, FILE *out, StrBuffer *buffer, bool echo) {
       break;
     }
 
-    strbuffer_write(buffer, (char)b);
+    strbuf_write(buffer, (char)b);
   }
 
   // return last byte, if it is EOF the caller will know
@@ -225,8 +224,8 @@ TrialState trial_run(Trial *t, FILE *out) {
     return state;
   }
 
-  StrBuffer input = strbuffer_init(32);
-  StrBuffer expected = strbuffer_init(32);
+  StrBuffer input = strbuf_init(32);
+  StrBuffer expected = strbuf_init(32);
 
   usize line = 1;
 
@@ -263,8 +262,8 @@ TrialState trial_run(Trial *t, FILE *out) {
     state.err = ERR_PROCESS_UNEXPECTED_DATE_END;
   }
 
-  strbuffer_free(&input);
-  strbuffer_free(&expected);
+  strbuf_free(&input);
+  strbuf_free(&expected);
 
   state.exit = pclose(pio);
   fclose(eio);
