@@ -1,6 +1,7 @@
 TARGET_EXEC := trialrun
 TEST_EXEC := test
 CC=gcc
+SCL=/usr/local/include/libscl.so/include
 
 BIN_INSTALL_DIR := /usr/local/bin
 LIB_INSTALL_DIR := /usr/local/lib 
@@ -12,7 +13,7 @@ TYPE := bin
 BUILD_DIR := ./build
 BUILD_DIR_TEST := $(BUILD_DIR)/build_test
 SRC_DIRS := ./src
-INC_DIRS := ./include /usr/local/include/libscl.so/include
+INC_DIRS := ./include $(SCL) 
 EX_CC_FLAGS :=
 EX_LD_FLAGS :=
 # Find all the C and C++ files we want to compile
