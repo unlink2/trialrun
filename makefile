@@ -12,7 +12,7 @@ TYPE := bin
 BUILD_DIR := ./build
 BUILD_DIR_TEST := $(BUILD_DIR)/build_test
 SRC_DIRS := ./src
-INC_DIRS := ./include
+INC_DIRS := ./include /usr/local/include/libscl.so/include
 EX_CC_FLAGS :=
 EX_LD_FLAGS :=
 # Find all the C and C++ files we want to compile
@@ -38,7 +38,7 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 # These files will have .d instead of .o as the output.
 CFLAGS := $(INC_FLAGS) -MMD -MP -Wall -Wpedantic -g $(EX_CC_FLAGS) -DTYPE=$(TYPE)
 
-LDFLAGS := $(EX_LD_FLAGS)
+LDFLAGS := $(EX_LD_FLAGS) -lscl
 
 # The final build step.
 # This builds a binary, shared or static library
@@ -117,14 +117,14 @@ clean:
 # installs the binary, shared library or static library  
 .PHONY: install 
 install:
-ifeq ($(BIN), a)
+ifeq ($(TYPE), a)
 	mkdir -p $(INC_INSTALL_DIR) 
 	cp -f $(BUILD_DIR)/$(TARGET_EXEC) $(LIB_INSTALL_DIR)
-	for u in $(INC_DIRS); do echo $$u; cp -f $$u $(INC_INSTALL_DIR); done
-else ifeq ($(BIN), so)
+	for u in $(INC_DIRS); do echo $$u; cp -r -f $$u $(INC_INSTALL_DIR); done
+else ifeq ($(TYPE), so)
 	mkdir -p $(INC_INSTALL_DIR) 
 	cp -f $(BUILD_DIR)/$(TARGET_EXEC) $(LIB_INSTALL_DIR)
-	for u in $(INC_DIRS); do echo $$u; cp -f $$u $(INC_INSTALL_DIR); done
+	for u in $(INC_DIRS); do echo $$u; cp -r -f $$u $(INC_INSTALL_DIR); done
 else 
 	mkdir -p $(BIN_INSTALL_DIR)
 	cp -f $(BUILD_DIR)/$(TARGET_EXEC) $(BIN_INSTALL_DIR)
