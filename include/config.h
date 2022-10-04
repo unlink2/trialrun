@@ -2,7 +2,7 @@
 #define CONFIG_H_
 
 #include "error.h"
-#include "types.h"
+#include <types.h>
 #include <stdio.h>
 
 #define DEFAULT_PATH_IN "-"

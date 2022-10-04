@@ -1,7 +1,7 @@
 #ifndef TRIAL_H_
 #define TRIAL_H_
 
-#include "types.h"
+#include <types.h>
 #include "error.h"
 #include <stdio.h>
 
