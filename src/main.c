@@ -4,7 +4,7 @@
  */
 #include "config.h"
 #include <string.h>
-#include <scl.h>
+#include <scl/scl.h>
 
 #ifndef TEST
 
@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
  */
 #ifdef TEST
 
-#include "macros.h"
+#include <scl/macros.h>
 #include "error.h"
 #include "trial.h"
 

@@ -4,9 +4,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include "macros.h"
+#include <scl/macros.h>
 #include "str.h"
-#include <scl.h>
+#include <scl/scl.h>
 
 #define BEGIN "===BEGIN"
 #define END "===END"
@@ -311,7 +311,7 @@ void trial_free(Trial *trial) {
 
 #ifdef TEST
 
-#include "macros.h"
+#include <scl/macros.h>
 
 void test_trial_parse_next(void **state) {
   {
