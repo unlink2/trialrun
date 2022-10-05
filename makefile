@@ -1,11 +1,11 @@
+NAME := trialrun 
 TARGET_EXEC := trialrun
 TEST_EXEC := test
 CC=gcc
-SCL=/usr/local/include/libscl.so/include
 
 BIN_INSTALL_DIR := /usr/local/bin
 LIB_INSTALL_DIR := /usr/local/lib 
-INC_INSTALL_DIR := /usr/local/include/$(TARGET_EXEC)/
+INC_INSTALL_DIR := /usr/local/include/$(NAME)/
 
 # valid inputs: bin, a (static lib), so (shared lib), h (header only)
 TYPE := bin 
@@ -13,7 +13,7 @@ TYPE := bin
 BUILD_DIR := ./build
 BUILD_DIR_TEST := $(BUILD_DIR)/build_test
 SRC_DIRS := ./src
-INC_DIRS := ./include $(SCL) 
+INC_DIRS := ./include 
 EX_CC_FLAGS :=
 EX_LD_FLAGS :=
 # Find all the C and C++ files we want to compile
@@ -121,11 +121,11 @@ install:
 ifeq ($(TYPE), a)
 	mkdir -p $(INC_INSTALL_DIR) 
 	cp -f $(BUILD_DIR)/$(TARGET_EXEC) $(LIB_INSTALL_DIR)
-	for u in $(INC_DIRS); do echo $$u; cp -r -f $$u $(INC_INSTALL_DIR); done
+	for u in $(INC_DIRS)/*; do echo $$u; cp -r -f $$u $(INC_INSTALL_DIR); done
 else ifeq ($(TYPE), so)
 	mkdir -p $(INC_INSTALL_DIR) 
 	cp -f $(BUILD_DIR)/$(TARGET_EXEC) $(LIB_INSTALL_DIR)
-	for u in $(INC_DIRS); do echo $$u; cp -r -f $$u $(INC_INSTALL_DIR); done
+	for u in $(INC_DIRS)/*; do echo $$u; cp -r -f $$u $(INC_INSTALL_DIR); done
 else 
 	mkdir -p $(BIN_INSTALL_DIR)
 	cp -f $(BUILD_DIR)/$(TARGET_EXEC) $(BIN_INSTALL_DIR)
