@@ -48,7 +48,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 
     // all args are a single trial, just parse them until we are out of args
     cfg->in_path = arg;
-    cfg->overall |= run_tests(cfg);
+    cfg->overall |= tr_run_tests(cfg);
     break;
   case ARGP_KEY_END:
     if (state->arg_num < 1) {

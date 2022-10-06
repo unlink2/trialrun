@@ -10,17 +10,13 @@
 
 #define BEGIN "===BEGIN"
 #define END "===END"
-#define DELIM '='
 
-typedef struct TrialParseResult {
-  char *start;
-  char *next;
-  Error err;
-} TrialParseResult;
+typedef struct TrialParseIni {
+  SclIni ini;
+  Trial *t;
+} TrialParseIni;
 
 void trial_state_init(TrialState *s) { memset(s, 0, sizeof(TrialState)); }
-
-bool trial_is_end(char c) { return c == '\0' || c == '\n' || c == '\r'; }
 
 bool trial_bool_val(Str value, Error *err) {
   *err = OK;
@@ -38,7 +34,11 @@ bool trial_bool_val(Str value, Error *err) {
   }
 }
 
-Error trial_parse_handle(Trial *t, Str key, Str value) {
+int trial_parse_on_section(SclIni *ini, Str key) { return OK; }
+
+int trial_parse_on_value(SclIni *ini, Str key, Str value) {
+  TrialParseIni *tini = (TrialParseIni *)ini;
+  Trial *t = tini->t;
   Error err = OK;
 
   // dumb check for each possible key
@@ -76,73 +76,6 @@ Error trial_parse_handle(Trial *t, Str key, Str value) {
   return err;
 }
 
-char *trial_skip_whitespace(char *input) {
-  // skip leading whitespaces
-  while (isspace(input[0])) {
-    input++;
-  }
-
-  return input;
-}
-
-char *trial_skip_comment(char *input) {
-  input = trial_skip_whitespace(input);
-  while (input[0] == '#') {
-    // loop until next line
-    while (input[0] != '\n' && !trial_is_end(input[0])) {
-      input++;
-    }
-    input = trial_skip_whitespace(input);
-  }
-  return input;
-}
-
-// parse the next trial input and return the end pointer
-TrialParseResult trial_parse_next(Trial *t, char *input) {
-  TrialParseResult r;
-
-  input = trial_skip_whitespace(input);
-  input = trial_skip_comment(input);
-
-  if (input[0] == '\0') {
-    r.next = input;
-    r.err = OK;
-    return r;
-  }
-
-  r.start = input; // start of line
-
-  Str key = str_init(input, 0);
-
-  // get key until = or end of line
-  while (input[0] != DELIM && !trial_is_end(input[0])) {
-    input++;
-    key.len++;
-  }
-
-  // if we did not find an = the file is invalid
-  if (input[0] == '\0') {
-    scl_log_fprintf(stderr, ERROR, "Unexpected end: %s\n", input);
-    r.next = input; // the char where the invalid state occured
-    r.err = ERR_TRIAL_PARSER_UNEXPECTED_END;
-    return r;
-  }
-
-  // otherwise we now have a key
-  Str value = str_init(++input, 0); // char after = is start of value
-
-  // obtain value
-  while (!trial_is_end(input[0])) {
-    input++;
-    value.len++;
-  }
-
-  r.next = input;
-  r.err = trial_parse_handle(t, key, value);
-
-  return r;
-}
-
 void trial_init(Trial *t) {
   memset(t, 0, sizeof(Trial));
 
@@ -157,22 +90,22 @@ void trial_init(Trial *t) {
 }
 
 Trial trial_from(char *input) {
-  // end of input data pointer
-  char *input_end = input + strlen(input);
-
   Trial trial;
   trial_init(&trial);
 
   // parse until the end of input
-  while (input < input_end) {
-    TrialParseResult r = trial_parse_next(&trial, input);
 
-    // propagate error
-    if (r.err) {
-      trial.err = r.err;
-      return trial;
-    }
-    input = r.next;
+  TrialParseIni ini;
+  ini.ini = scl_ini_init(trial_parse_on_value, trial_parse_on_section);
+  ini.t = &trial;
+
+  Str s = str_init(input, strlen(input));
+  SclIniRes ini_res = scl_ini_parse((SclIni *)&ini, s);
+  if (ini_res.err) {
+    trial.err = ERR_TRIAL_PARSE;
+  }
+  if (ini_res.usr_err) {
+    trial.err = ini_res.usr_err;
   }
 
   return trial;
@@ -277,6 +210,7 @@ TrialState trial_run(Trial *t, FILE *out) {
   if (!state.success) {
     scl_log_fprintf(stderr, ERROR, "[%s] %s\n", t->name,
                     error_to_str(state.err));
+    state.err = ERR_TRIAL_FAILURE;
   }
 
   scl_log_fprintf(out, OUTPUT, "[%s] %s\n", t->name,
@@ -313,33 +247,6 @@ void trial_free(Trial *trial) {
 
 #include <scl/macros.h>
 
-void test_trial_parse_next(void **state) {
-  {
-    Trial t;
-    trial_init(&t);
-    assert_false(t.echo);
-    TrialParseResult r = trial_parse_next(&t, "echo=true");
-
-    assert_true(r.err == OK);
-    assert_true(t.echo);
-    trial_free(&t);
-  }
-  {
-    Trial t;
-    trial_init(&t);
-    TrialParseResult r = trial_parse_next(&t, "ech=true");
-
-    assert_true(r.err == ERR_TRIAL_PARSER_KEY_ERROR);
-    trial_free(&t);
-  }
-  {
-    Trial t;
-    trial_init(&t);
-    TrialParseResult r = trial_parse_next(&t, "echo=tru");
-
-    assert_true(r.err == ERR_TRIAL_PARSER_VALUE_ERROR);
-    trial_free(&t);
-  }
-}
+void test_trial_parse_next(void **state) {}
 
 #endif

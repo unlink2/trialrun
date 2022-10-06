@@ -28,7 +28,7 @@ void close_output(FILE *f) {
   fclose(f);
 }
 
-Error run_tests(Config *cfg) {
+Error tr_run_tests(Config *cfg) {
   FILE *trial_file = fopen(cfg->in_path, "re");
   FILE *out = open_output(cfg);
 
@@ -41,11 +41,11 @@ Error run_tests(Config *cfg) {
     scl_log_fprintf(stderr, ERROR, "File IO Error: %s\n", cfg->out_path);
     return ERR_FILE_OPEN;
   }
-  run_test(cfg, trial_file, out);
+  Error e = tr_run_test(cfg, trial_file, out);
 
   close_output(out);
   fclose(trial_file);
-  return OK;
+  return e;
 }
 
 char *file_read_all(FILE *f) {
@@ -60,15 +60,15 @@ char *file_read_all(FILE *f) {
   return buffer;
 }
 
-Error run_test(Config *cfg, FILE *f, FILE *out) {
+Error tr_run_test(Config *cfg, FILE *f, FILE *out) {
   char *buffer = file_read_all(f);
   // the entire file is in buffer now
   // parse it!
 
   Trial t = trial_from(buffer);
-  trial_run(&t, out);
+  TrialState s = trial_run(&t, out);
 
   trial_free(&t);
   free(buffer);
-  return t.err;
+  return s.err;
 }
