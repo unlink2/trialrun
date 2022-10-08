@@ -137,6 +137,7 @@ TrialState trial_run(Trial *t, FILE *out) {
   Config *cfg = cfg();
   TrialState state;
   trial_state_init(&state);
+  state.err = t->err;
   if (t->err) {
     return state;
   }
