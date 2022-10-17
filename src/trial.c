@@ -25,10 +25,10 @@ bool trial_bool_val(Str value, Error *err) {
   } else if (str_eq_raw(value, "false")) {
     return FALSE;
   } else {
-    char *failed_value = str_to_str(value);
+    char *failed_value = str_to_str_alloc(value, alloc());
     scl_log_fprintf(stderr, ERROR, "Value Error: %s %d\n", failed_value,
                     value.len);
-    free(failed_value);
+    alloc().free(failed_value);
     *err = ERR_TRIAL_PARSER_VALUE_ERROR;
     return FALSE;
   }
@@ -46,30 +46,30 @@ int trial_parse_on_value(SclIni *ini, Str key, Str value) {
   if (str_eq_raw(key, "echo")) {
     t->echo = trial_bool_val(value, &err);
   } else if (str_eq_raw(key, "name")) {
-    free(t->name);
-    t->name = str_to_str(value);
+    alloc().free(t->name);
+    t->name = str_to_str_alloc(value, alloc());
   } else if (str_eq_raw(key, "command")) {
-    free(t->command);
-    t->command = str_to_str(value);
+    alloc().free(t->command);
+    t->command = str_to_str_alloc(value, alloc());
   } else if (str_eq_raw(key, "data")) {
-    free(t->data_path);
-    t->data_path = str_to_str(value);
+    alloc().free(t->data_path);
+    t->data_path = str_to_str_alloc(value, alloc());
   } else if (str_eq_raw(key, "expected")) {
-    free(t->expected_path);
-    t->expected_path = str_to_str(value);
+    alloc().free(t->expected_path);
+    t->expected_path = str_to_str_alloc(value, alloc());
   } else if (str_eq_raw(key, "test-line-prefix")) {
-    free(t->test_line_prefix);
-    t->test_line_prefix = str_to_str(value);
+    alloc().free(t->test_line_prefix);
+    t->test_line_prefix = str_to_str_alloc(value, alloc());
   } else if (str_eq_raw(key, "begin")) {
-    free(t->begin);
-    t->begin = str_to_str(value);
+    alloc().free(t->begin);
+    t->begin = str_to_str_alloc(value, alloc());
   } else if (str_eq_raw(key, "end")) {
-    free(t->end);
-    t->end = str_to_str(value);
+    alloc().free(t->end);
+    t->end = str_to_str_alloc(value, alloc());
   } else {
-    char *failed_key = str_to_str(key);
+    char *failed_key = str_to_str_alloc(key, alloc());
     scl_log_fprintf(stderr, ERROR, "Key error '%s'\n", failed_key);
-    free(failed_key);
+    alloc().free(failed_key);
     return ERR_TRIAL_PARSER_KEY_ERROR;
   }
 
@@ -80,13 +80,13 @@ void trial_init(Trial *t) {
   memset(t, 0, sizeof(Trial));
 
   // set up defaults
-  t->begin = str_from(BEGIN);
-  t->end = str_from(END);
-  t->test_line_prefix = str_from("");
+  t->begin = str_from_alloc(BEGIN, alloc());
+  t->end = str_from_alloc(END, alloc());
+  t->test_line_prefix = str_from_alloc("", alloc());
 
-  t->data_path = str_from(DEFAULT_PATH_OUT);
+  t->data_path = str_from_alloc(DEFAULT_PATH_OUT, alloc());
   t->echo = FALSE;
-  t->expected_path = str_from(DEFAULT_PATH_IN);
+  t->expected_path = str_from_alloc(DEFAULT_PATH_IN, alloc());
 }
 
 Trial trial_from(char *input) {
@@ -158,8 +158,8 @@ TrialState trial_run(Trial *t, FILE *out) {
     return state;
   }
 
-  StrBuffer input = strbuf_init(32);
-  StrBuffer expected = strbuf_init(32);
+  StrBuffer input = strbuf_init_alloc(32, alloc());
+  StrBuffer expected = strbuf_init_alloc(32, alloc());
 
   usize line = 1;
 
@@ -235,13 +235,13 @@ void trial_free(Trial *trial) {
     return;
   }
 
-  free(trial->begin);
-  free(trial->end);
-  free(trial->test_line_prefix);
-  free(trial->data_path);
-  free(trial->command);
-  free(trial->name);
-  free(trial->expected_path);
+  alloc().free(trial->begin);
+  alloc().free(trial->end);
+  alloc().free(trial->test_line_prefix);
+  alloc().free(trial->data_path);
+  alloc().free(trial->command);
+  alloc().free(trial->name);
+  alloc().free(trial->expected_path);
 }
 
 #ifdef TEST

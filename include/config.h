@@ -2,6 +2,7 @@
 #define CONFIG_H_
 
 #include "error.h"
+#include <scl/sclalloc.h>
 #include <scl/types.h>
 #include <stdio.h>
 
@@ -16,6 +17,9 @@ typedef struct Config {
 
   char *in_path;
   char *out_path;
+
+  SclAlloc alloc;
+
   Error overall;
 } Config;
 
@@ -26,6 +30,7 @@ void cfg_init(Config *cfg);
 // this macro obtains the config object and
 // creates it in the local scope
 #define cfg() &global_cfg;
+#define alloc() (global_cfg.alloc)
 
 // Re-open stdout to output path if path is not -
 FILE *open_output(Config *cfg);

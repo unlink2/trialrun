@@ -12,6 +12,7 @@ void cfg_init(Config *cfg) {
   cfg->in_path = DEFAULT_PATH_IN;
   cfg->out_path = DEFAULT_PATH_OUT;
   scl_log_set_level(cfg->log_level);
+  cfg->alloc = scl_default_alloc();
 }
 
 FILE *open_output(Config *cfg) {
@@ -53,7 +54,7 @@ char *file_read_all(FILE *f) {
   usize len = ftell(f);
   rewind(f);
 
-  char *buffer = malloc(len + 1);
+  char *buffer = alloc().malloc(len + 1);
   memset(buffer, 0, len + 1);
 
   fread(buffer, len, 1, f);
@@ -69,6 +70,6 @@ Error tr_run_test(Config *cfg, FILE *f, FILE *out) {
   TrialState s = trial_run(&t, out);
 
   trial_free(&t);
-  free(buffer);
+  alloc().free(buffer);
   return s.err;
 }
