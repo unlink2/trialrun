@@ -16,7 +16,7 @@ typedef struct TrialParseIni {
   Trial *t;
 } TrialParseIni;
 
-void trial_state_init(TrialState *s) { memset(s, 0, sizeof(TrialState)); }
+void trial_state_init(TrialState *s) { scl_memset(s, 0, sizeof(TrialState)); }
 
 bool trial_bool_val(Str value, Error *err) {
   *err = OK;
@@ -77,7 +77,7 @@ int trial_parse_on_value(SclIni *ini, Str key, Str value) {
 }
 
 void trial_init(Trial *t) {
-  memset(t, 0, sizeof(Trial));
+  scl_memset(t, 0, sizeof(Trial));
 
   // set up defaults
   t->begin = str_from_alloc(BEGIN, alloc());
@@ -99,7 +99,7 @@ Trial trial_from(char *input) {
   ini.ini = scl_ini_init(trial_parse_on_value, trial_parse_on_section);
   ini.t = &trial;
 
-  Str s = str_init(input, strlen(input));
+  Str s = str_init(input, scl_strlen(input));
   SclIniRes ini_res = scl_ini_parse((SclIni *)&ini, s);
   if (ini_res.err) {
     trial.err = ERR_TRIAL_PARSE;

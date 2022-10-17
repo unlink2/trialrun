@@ -16,7 +16,8 @@ void cfg_init(Config *cfg) {
 }
 
 FILE *open_output(Config *cfg) {
-  if (strncmp(cfg->out_path, DEFAULT_PATH_OUT, strlen(DEFAULT_PATH_OUT)) == 0) {
+  if (scl_strncmp(cfg->out_path, DEFAULT_PATH_OUT,
+                  scl_strlen(DEFAULT_PATH_OUT)) == 0) {
     return stdout;
   }
   return fopen(cfg->out_path, "we");
@@ -55,7 +56,7 @@ char *file_read_all(FILE *f) {
   rewind(f);
 
   char *buffer = alloc().malloc(len + 1);
-  memset(buffer, 0, len + 1);
+  scl_memset(buffer, 0, len + 1);
 
   fread(buffer, len, 1, f);
   return buffer;
